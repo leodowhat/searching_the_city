@@ -1,0 +1,59 @@
+#!/usr/bin/python3
+# -*- coding=utf-8 -*-
+# date: 2017-12-2
+# 读取经纬度xml，并存入mysql中
+import xml.dom.minidom 
+#import pymsql
+from os.path import dirname
+from sqlalchemy import Column, String, create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+  
+# 创建对象的基类:
+Base = declarative_base()
+
+# 定义城市对象:
+class City(Base):
+    # 表的名字:
+    __tablename__ = 'city'
+
+    # 表的结构:
+    id = Column(String(20), primary_key=True)
+    cname = Column(String(20))
+    pname = Column(String(20))
+    longitude = Column(String(20))
+    altitude = Column(String(20))
+
+#dsn = 'mysql://root@localhost/test'
+dsn = 'sqlite:///:memory:'
+   
+class Test(object):
+    def __init__(self, dsn):
+        try:
+            eng = create_engine(dsn,echo=True)
+        except ImportError:
+            raise RuntimeError()
+            
+        try:
+            eng.connect()#尝试连接数据库
+        except exc.OperationalError:
+            eng = create_engine(dirname(dsn))
+            eng.excute('CREATE DATABASE test').close()
+            eng = create_engine(dsn)
+            
+        Session = orm.sessionmaker(bind=eng)
+        self.ses = Session()
+        self.city = City.__table__
+        self.eng = self.city.metadata.bind = eng#引擎与表的元数据进行额外的绑定
+        
+    def insert(self, cname, pname, longitude, altitude):
+        self.ses.add_all(City(cname, pname, longitude, altitude))
+        self.ses.commit()
+        
+    def check(self, lo, al):
+        try:
+            city = self.ses.query(
+                City).filter_by(
+                    longitude = 103.97, altitude = 24.85)                
+            printf('%s') % city
+dom = xml.dom.minidom.parse('jinweiduxinxi.xml')
